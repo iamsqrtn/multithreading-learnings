@@ -15,6 +15,27 @@ void func(int* x) {
 }
 */
 
+/*
+// Pass by Value
+// arg will be a copy of the object passed by the caller
+void func(vector<string> arg) {
+    cout<<"size =  "<<arg.size()<<"\n";
+}
+
+// Pass by Move
+// The object passed by the caller is moved into arg
+void func(vector<string>&& arg) {
+    cout<<"size = "<<arg.size()<<"\n";
+}
+*/
+
+/*
+// The caller's object will be moved into x
+void func(int&& x) {
+    cout<<"rvalue reference\n";
+}
+*/
+
 int main() {
 
     // universal initialization
@@ -126,6 +147,33 @@ int main() {
         }       
     );
     cout<<n_radix<<"\n";
+    */
+
+    // move semantics
+    /*
+    vector<string>vec(1000000);
+
+    // Pass be Value
+    // cout<<"Before calling func, vector size = "<<vec.size()<<"\n";
+    // func(vec);
+    // cout<<"After calling func, vector size = "<<vec.size()<<"\n";
+
+    // Pass by Move
+    // cout<<"Before calling func, vector size = "<<vec.size()<<"\n";
+    // func(vec); // Error, doesn't compile, vec is not a movable rvalue
+    // cout<<"After calling func, vector size = "<<vec.size()<<"\n";
+
+    // cout<<"Before calling func, vector size = "<<vec.size()<<"\n";
+    // func(move(vec)); // std::move() casts vec to an rvalue
+    // cout<<"After calling func, vector size = "<<vec.size()<<"\n";
+    */
+    
+    // reference
+    /*
+    // func(2);
+
+    int y = 2;
+    func(y);    // Error, must be a movable rvalue
     */
 
     return 0;
