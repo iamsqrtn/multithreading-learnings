@@ -3,6 +3,8 @@
 #include<vector>
 #include<chrono>
 #include<algorithm>
+#include<utility>
+
 using namespace std;
 
 /*
@@ -34,6 +36,39 @@ void func(vector<string>&& arg) {
 void func(int&& x) {
     cout<<"rvalue reference\n";
 }
+*/
+
+/*
+// Define a moveable type
+// The compiler will provide move operators
+class Test {};
+
+// Function which takes lvalue reference
+void func(const Test& test) {
+    cout<<"lvalue reference\n";
+}
+
+// Function which takes rvalue reference
+void func(Test&& test) {
+    cout<<"rvalue reference\n";
+}
+*/
+
+/*
+// A move-only class
+class Test {
+public:
+    // = delete means the function exists but cannot be called
+    // In older C++, we had to declare the member function private
+    Test(const Test&) = delete;
+    Test& operator = (const Test&) = delete;
+
+    // = default means the compiler will synthesize the default version of the operator
+    Test(Test&&) noexcept = default;
+    Test& operator = (Test&&) noexcept = default;
+
+    Test() = default;
+};
 */
 
 int main() {
@@ -174,6 +209,31 @@ int main() {
 
     int y = 2;
     func(y);    // Error, must be a movable rvalue
+    */
+
+    // move semantics
+    /*
+    Test test;
+
+    cout<<"Argument is test variable\n";
+    func(test);
+
+    cout<<"Argument is temporary object\n";
+    func(Test());
+
+    cout<<"Argument through std::move()\n";
+    func(move(test));
+    */
+
+    // move-only types
+    /*
+    Test test1, test2, test3;
+    
+    // Test test4(test1);
+    // test2 = test1;
+    
+    Test test4(move(test1));
+    test3 = move(test2);
     */
 
     return 0;
