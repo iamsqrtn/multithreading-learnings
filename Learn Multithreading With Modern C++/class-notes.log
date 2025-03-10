@@ -340,4 +340,78 @@ Modern C++ Overview Part Four -
             2. All built-in types are regarded as moveable (but are always copied).
 
 
+Modern C++ Overview Part Five -
+
+    1. lambda-local variables
+        1. Variables which are local to the lambda body.
+        2. Declared in the capture specifier.
+            1. Implicitly "auto".
+            2. Must be initialized.
+        3. Requires C++14.
+            // y is local to the lambda body
+            [y = 2] (int x) {
+                return x + y;
+            };
+        4. Can be initialized from captured variables.
+        5. No special syntax is needed.
+            // Local variable z in this scope
+            int z = 1;
+
+            // Lambda body's local variable y
+            [y = z + 1] (int x) {
+                return x + y;
+            };
+        6. capture by move
+            1. The lambda-local variables can be move initialized.
+                std::vector<std::string>strings(5);
+
+                // Lambda expression which captures "strings" by moving it into "vec_strings"
+                [vec_strings = std::move(strings)] () {
+                    ...  
+                };
+            2. This allows capture by move.
+                1. The type of vec_strings is deduced as std::vector<std::string>.
+                2. std::vector's move constructor is called to initialize vec_strings.
+                3. The vector elements are now owned by vec_strings.
+
+    2. random numbers in C++11
+        1. New classes defined in <random> header.
+            1. Avoid a number of issues with std::rand().
+        2. Random number engines.
+            1. Generate a sequence of random numbers.
+        3. Distribution objects.
+            1. Scale a sequence of numbers.
+            2. Fit them into a given statistical distribution.
+        4. We use the uniform distribution.
+            1. Every random number should be equally likely.
+    
+    3. random number classes
+        1. Functors which overload operator().
+        2. Random number engine.
+            1. std::mt19937 is usually the best choice.
+            2. Should be declared static.
+        3. Distribution object.
+            1. std::uniform_int_distribution<T> for integers.
+            2. std::uniform_real_distribution<T> for floating-point.
+        4. To get a random number.
+            1. Call the distribution's operator().
+            2. Pass the engine object as argument.
+    
+    4. std::unique_ptr
+        1. Template class defined in <memory> header.
+            1. Has a traditional pointer as member.
+        2. Supports most pointer operations.
+            1. But not increment or decrement.
+        3. A move-only class which uses the RAII (Resource Acquisition Is Initialization) idiom.
+            1. Automatically releases the memory when it goes out of scope.
+            2. Allows heap-allocated memory to be used like a stack object.
+            3. Has no more overhead than a traditional pointer.
+        4. std::unique_ptr initialization
+            1. In C++11, we have to provide the pointer.
+                // Allocate a single integer with value 42
+                std::unique_ptr<int>ptr(new int(42));
+            2. C++14 has std::make_unique().
+            3. This calls new() internally.
+                auto ptr = std::make_unique<int>(42);
+
 Keep Coding!!!

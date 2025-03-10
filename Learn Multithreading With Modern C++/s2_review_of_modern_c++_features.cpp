@@ -4,6 +4,8 @@
 #include<chrono>
 #include<algorithm>
 #include<utility>
+#include<random>
+#include<memory>
 
 using namespace std;
 
@@ -68,6 +70,19 @@ public:
     Test& operator = (Test&&) noexcept = default;
 
     Test() = default;
+};
+*/
+
+/*
+// Create an engine object
+std::mt19937 mt;
+*/
+
+/*
+// Data structure representing a point on the screen
+struct Point {
+    int x;
+    int y;
 };
 */
 
@@ -234,6 +249,82 @@ int main() {
     
     Test test4(move(test1));
     test3 = move(test2);
+    */
+
+    // lambda-local variables
+    /*
+    auto add_two = [y = 2] (int x) {
+        return x + y;
+    };
+    cout<<add_two(2)<<"\n";
+    cout<<add_two(5)<<"\n";
+
+    // z is a local variable in the containing scope of the lambda
+    int z = 1;
+    
+    // y is local to the lambda body
+    // It is initialized using the local variable z
+    auto add_z_plus = [y = z + 1](int x) {
+        return x + y;
+    };
+    cout<<add_z_plus(2)<<"\n";
+    cout<<add_z_plus(5)<<"\n";
+    */
+
+    // lambda-local variables and capture by move
+    /*
+    vector<string>strings(5);
+
+    cout<<"Capture by reference\n";
+    // Lambda expression which captures "strings" by reference
+    [&strings] () {
+        cout<<strings.size()<<"\n";
+    }();
+    cout<<strings.size()<<"\n";
+
+    cout<<"Capture by move\n";
+    // Lambda expression which captures "strings" by move
+    // Create a new variable "vec_strings" which is local to the lambda body
+    // Initialize it by moving "strings" into it
+    [vec_strings = move(strings)] () {
+        cout<<vec_strings.size()<<"\n";
+    }();
+    cout<<strings.size()<<"\n";
+    */
+
+    // random number classes
+    /*
+    // We want integers in the range 0 to 100
+    cout<<"5 random integers between 0 and 100\n";
+
+    uniform_int_distribution<int> uid(0, 100);
+    // Get 5 random numbers
+    for(int i=0; i<5; i++) {
+        // Invoking the distribution returns the next number in the sequence
+        cout<<uid(mt) << ", ";
+    }
+    cout<<"\n";
+    
+    // We want doubles in the range 0 to 1
+    cout<<"5 random floating-point numbers between 0 and 1\n";
+
+    uniform_real_distribution<double> did(0, 1);
+    // Get 5 random numbers
+    for(int i=0; i<5; i++) {
+        // Invoking the distribution returns the next number in the sequence
+        cout<<did(mt) << ", ";
+    }
+    cout<<"\n";
+    */
+
+    // std::unique_ptr
+    /*
+    // Create a std::unique_ptr to a Point object which has initial values {3, 6}
+    auto ptr = std::make_unique<Point>(Point{3, 6});    // C++14
+    cout<<ptr->x<<", "<<ptr->y<<"\n";
+
+    // auto ptr = unique_ptr<Point>(new Point{3, 6});    // C++11
+    // cout<<ptr->x<<", "<<ptr->y<<"\n";
     */
 
     return 0;
