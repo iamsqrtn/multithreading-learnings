@@ -7,6 +7,7 @@ Why Multithreading?
     3. Everything is becoming threaded.
     4. Valuable skill in today's world.
 
+
 ++++++++++++++++++++++++++++++++++++++++ Section 2 - Review of Modern C++ Features ++++++++++++++++++++++++++++++++++++++++
 
 Modern C++ Overview Part One -
@@ -301,7 +302,7 @@ Modern C++ Overview Part Four -
             1. std::fstream, std::iostream
             2. std::unique_ptr
             3. Classes used in multi-threading.
-        2. These types follow the RAII (Resource Acquisition Is Initialization) idiom.
+        2. These types follow the "RAII (Resource Acquisition Is Initialization)" idiom.
             1. Only one object can own a given resource instance at a time.
             2. The object acquires ownership in the constructor.
             3. The object releases ownership in the destructor.
@@ -402,7 +403,7 @@ Modern C++ Overview Part Five -
             1. Has a traditional pointer as member.
         2. Supports most pointer operations.
             1. But not increment or decrement.
-        3. A move-only class which uses the RAII (Resource Acquisition Is Initialization) idiom.
+        3. A move-only class which uses the "RAII (Resource Acquisition Is Initialization)" idiom.
             1. Automatically releases the memory when it goes out of scope.
             2. Allows heap-allocated memory to be used like a stack object.
             3. Has no more overhead than a traditional pointer.
@@ -413,5 +414,299 @@ Modern C++ Overview Part Five -
             2. C++14 has std::make_unique().
             3. This calls new() internally.
                 auto ptr = std::make_unique<int>(42);
+
+
+++++++++++++++++++++++++++++++++++++++++ Section 3 - Introduction to Concurrency ++++++++++++++++++++++++++++++++++++++++
+
+Concurrency Introduction - 
+
+    1. concurrency
+        1. Perform two activities at the same time.
+            1. Conceptually different.
+        2. A program which executes a long-running task.
+            1. Fetching data over the network.
+            2. Performing a lengthy computation.
+            3. The data fetching and the computation are performed at the same time.
+        3. A program which displays feedback to the user.
+            1. Hourglass cursor.
+            2. Progress counter.
+            3. The task and the feedback are performed at the same time.
+        4. Standard in operating systems for many years.
+        5. Computers run many programs at the same time.
+            1. Compiler generates code.
+            2. WordProcessor waits for next keystroke.
+            3. Mail program fetches a new email.
+    
+    2. hardware concurrency
+        1. Modern computers have multiple processors.
+            1. Multiple CPU chips.
+            2. CPU chips which contain multiple processor "cores".
+        2. Different processors can perform different activities at the same time.
+            1. Even within the same program.
+        3. These are known as "hardware threads".
+            1. Each processor follows its own "thread of execution" through the code.
+            2. 1 hardware thread <--> 1 processor core.
+
+    3. software concurrency
+        1. Modern operating systems support "software threading".
+        2. A program can perfrom multiple activities at the same time.
+            1. These activities are managed by the operating system.
+        3. Typically there are more software threads than hardware threads.
+            1. Some threads may have to stop and wait for something.
+            2. While they are waiting, another thread which is ready can run.
+    
+
+Concurrency Motivation - 
+
+    1. why is concurrency important?
+        1. Had been used by mainframes since the 1960's.
+        2. Became wider concern in the mid 1990's.
+        3. Four main industry trends.
+            1. Rise of the Internet.
+                1. Server throughput had to increase dramatically.
+            2. Popularity of Windows.
+                1. Seperation of concerns (responsiveness).
+            3. Popularity of games and multimedia.
+                1. Fast numeric computation.
+            4. Availability of multi-core processors.
+                1. Effective use of hardware.
+    
+    2. server throughput
+        1. A single-threaded server.
+        2. Performs each activity as a single "process".
+            1. An instance of an executing program.
+        3. A server process waits for a client to connect to it.
+        4. When a client connects, the server creates a new process.
+            1. The child process handles the client.
+            2. The server waits for the next connecetion.
+        5. The server may need to communicate with a child process.
+            1. Control its execution.
+            2. Exchange data with it.
+        6. This requires "InterProcess Communication (IPC)".
+        7. A single-threading causes overhead.
+            1. Process creation.
+            2. Setting up IPC.
+        8. Reduces scalability.
+    
+    3. seperation of concerns   
+        1. A single-threaded program to edit documents.
+        2. The user starts a long-running action.
+            1. Indexing or formatting a large document.
+        3. The program cannot respond to GUI events immediately.
+            1. It is executing code to perform the action.
+        4. The user interface ignores mouse-clicks, key-presses, etc.
+            1. If the program is covered up by another application and then uncovered, it turns into a grey box.
+        5. Eventually, the action ends.
+            1. The program processess all the stored-up GUI events.
+            2. Usually, with undesirable consequences.
+            3. Poor user experience.
+    
+    4. fast numeric computation
+        1. Used to require specialized hardware.
+            1. Supercomputers and transputers with large number of processors.
+            2. Parallel processing architecure.
+            3. Specialized programming languages.
+            4. Very expensive.
+        2. Now feasible on modern general-purpose hardware.
+            1. Much lower cost.
+            2. Supported by standard programming languages.
+        3. But not with single-threaded programs.
+
+    5. effective use of hardware
+        1. Demand for faster and more powerful computers.
+            1. Make the processor bigger.
+            2. Raise the clock frequency.
+        2. Hardware engineers approaching physical limits.
+            1. Speed at which electrons can move through silicon.
+            2. Heat generated.
+        3. Hardware designers began using "cores" instead.
+            1. Several processors on the same silicon chip.
+        4. A single-threaded program can only run on one core at a time.
+            1. Only uses a fraction of the system's potential. 
+    
+    6. benefits of concurrency
+        1. Higher server throughput.
+            1. The child and the server can run in the same process.
+            2. No overhead from creating processess.
+            3. Can have direct access to each other's data.
+        2. Seperation of concerns
+            1. A program can respond to GUI events while performing a lon-running task.
+            2. Improves the user experience.
+        3. Fast numeric computation.
+        4. Effective use of hardware.
+            1. A program can execute on different cores at the same time.
+
+
+Concurrency Overview - 
+
+    1. single-threaded concurrency
+        1. Each activity requires a seperate process.
+            1. Has one "execution path" or "thread" through the program's code.
+        2. May need "InterProcess Communication (IPC)".
+            1. A message queue, pipe, semaphore, shared memory, network socket, etc.
+        3. A program which displays a progress counter.
+            counter.exe <---- start/stop ----> data_cruncher.exe 
+        4. Each process has its own private memory space.
+            1. Cannot accidently alter another process's data.
+        5. Processes can be run on different computers over a network.
+        6. Creating a new process can be slow on some systems.
+        7. "InterProcess Communication (IPC)".
+            1. Adds complication.
+            2. Can be slow to set up.
+            3. No direct support in C++.
+    
+    2. multi-threaded concurrency
+        1. A single process performs all activities.
+        2. Each activity has its own "execution path" or "thread".
+        3. Concurrency is achieved by starting a new thread for each activity.
+                        <---- start ---- | 
+            counter.exe                compute     
+                         <---- stop ---- |
+                                         | 
+                    data_cruncher.exe    ↓
+
+    3. threads 
+        1. Each thread is an "independent execution environment".
+            1. Has its own execution stack.
+            2. Has its own processor state.
+        2. These "threads" are "light weight processes".
+            1. Less overhead to start up.
+            2. Smaller task switching overhead.
+            3. Easy to share data between threads.
+        3. All the threads in a process share its memory space.
+            1. Can access global data.
+            2. Pointers can be passed between threads.
+        4. Lack of data protection between threads.
+            1. Can cause data inconsistency and data corruption.
+            2. Requires careful programming.
+    
+    4. advantages of concurrency
+        1. Improves responsiveness of the program.
+            1. The user is never left staring at a "stuck" program.
+        2. Improves throughput.
+            1. Processing large amounts of data in parallel takes less time.
+        3. Allows seperation of logically distinct operations.
+            1. A mail program starts new threads.
+            2. Compose an email.
+            3. New fetch messages, etc.
+        4. Takes full advantage of modern hardware.
+            1. Threads can be distributed among processor cores.      
+
+    5. disadvantages of concurrency
+        1. Adds complexity to programs.
+            1. Code is harder to write and harder to understand.
+            2. Bugs are more likely.
+            3. Requires careful programming.
+        2. May not result in faster programs.
+            1. Data protection overhead.
+            2. Thread coordination overhead.
+        3. Use only when the benefits outweigh the costs.
+
+
+Threaded Program Structure - 
+
+    1. single-threaded C++ program structure
+        1. A non-threaded C++ programs have a single thread.
+            1. When this thread starts, it executes the code in main().
+            2. The main() is the entry point function for the thread.
+        2. The main() can call other functions.
+            1. These run in the main thread.
+        3. When main() returns, the thread ends.
+            1. The program ends when the main thread ends.
+        4. single-threaded program
+            // The program starts the main thread.
+            // The main thread executes all the instructions in main().
+                        main thread
+                            |
+                            |
+                            ↓ 
+
+    2. multi-threaded C++ program structure
+        1. A multi-threaded C++ programs also have a main thread.
+            1. The main thread starts additional threads.
+            2. These could, in turn, start further threads.
+        2. Each thread has its own entry point function.
+            1. When the thread starts, it executes the code in this function.
+            2. When the function returns, the thread ends.
+            3. The main thread continues to execute its own code.
+            4. It doesn't wait for the other threads, unless we explicitly tell it to.
+        3. multi-threaded program
+            // The program starts the main thread.
+            // The main thread executes all the instructions in main().
+            // The main thread also starts two other threads.
+            // The threads 2 and 3, execute their own code concurrently.
+                        main thread  thread 2  thread 3
+                            |           |        |
+                            |           |        |
+                            ↓           ↓        ↓ 
+
+A Brief History Of C++ Concurrency - 
+
+    1. multi-threading with C API's
+        1. At first, no direct support for threads in C++.
+        2. Programmers could only use threads through C interfaces.
+            1. pthreads library
+                1. For POSIX systems
+            2. Windows API's
+                1. Provided access to threads in the "Base Services".
+            3. Various Unix API's
+                1. System calls provided access to operating system's thread support.
+                2. Varied between providers.
+            4. OpenMP
+                1. Process C-style array loops in parallel.
+
+    2. multi-threading with C++ API's 
+        1. Later, C++ libraries appeared.
+            1. ACE
+                1. A cross-platform networking library with support for threads.
+            2. Boost
+                1. Project to develop new features for C++.
+                2. Basically a wrapper around the operating system's threading facilities.
+                3. Provided a consistent interface.
+                4. Used as basis for C++11 thread support.
+            3. Poco
+                1. A more modern and lightweight version of ACE.
+    
+    3. multi-threading with standard C++
+        1. C++ added support for concurreny in 2011.
+        2. Programmers can write threaded code which is,
+            1. Portable and efficient.
+            2. Has well-defined semantics.
+            3. Allows fine-grained control at low levels.
+        3. Standard library changes.
+            1. Features added to create and manage threads.
+            2. All classes and functions made thread-safe.
+    
+    4. multi-threading with C++11
+        1. The "std::thread class" is the "base level of concurrency".  
+            1. Rather low-level implementation.
+            2. Maps onto a "software thread".
+            3. Managed by the "operating system".
+            4. Similar to Boost threads, but with some important differences.
+                1. No thread cancellation.
+                2. Different argument passing semantics.
+                3. Different behavior on thread destruction.
+    
+    5. multi-threading with later C++
+        1. C++14
+            1. read-write locks
+        2. C++17
+            1. Many standard algorithms can execute in parallel.
+        3. C++20
+            1. Joining threads. 
+            2. Thread cancellation.
+            3. Coroutines, semaphores, latches, and barriers.
+        4. C++23
+            1. Improved support for coroutines.
+    
+    6. threads and tasks
+        1. These words are often used interchangeably.
+        2. A thread is,
+            1. A software thread.
+            2. An object of the C++ std::thread class.
+        3. A task is,
+            1. A higher-level abstraction.
+            2. Some work that should be performed concurrently.
+
 
 Keep Coding!!!
