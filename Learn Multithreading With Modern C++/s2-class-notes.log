@@ -292,7 +292,7 @@ Modern C++ Overview Part Four -
             1. std::fstream, std::iostream
             2. std::unique_ptr
             3. Classes used in multi-threading.
-        2. These types follow the RAII (Resource Acquisition Is Initialization) idiom.
+        2. These types follow the "RAII (Resource Acquisition Is Initialization)" idiom.
             1. Only one object can own a given resource instance at a time.
             2. The object acquires ownership in the constructor.
             3. The object releases ownership in the destructor.
@@ -393,7 +393,7 @@ Modern C++ Overview Part Five -
             1. Has a traditional pointer as member.
         2. Supports most pointer operations.
             1. But not increment or decrement.
-        3. A move-only class which uses the RAII (Resource Acquisition Is Initialization) idiom.
+        3. A move-only class which uses the "RAII (Resource Acquisition Is Initialization)" idiom.
             1. Automatically releases the memory when it goes out of scope.
             2. Allows heap-allocated memory to be used like a stack object.
             3. Has no more overhead than a traditional pointer.
