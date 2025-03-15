@@ -291,4 +291,92 @@ A Brief History Of C++ Concurrency -
             2. Some work that should be performed concurrently.
 
 
+Launching a Thread -
+
+    1. creating a thread
+        1. We need to create an std::thread object.
+            1. The class is defined in <thread> header.
+        2. The constructor starts a new execution thread.
+            1. This will execute immediately.
+        3. The parent thread will continue its own execution.
+
+    2. thread entry point
+        1. std::thread's constructor takes a callable object.
+            1. The thread's entry point function.
+        2. The execution thread will invoke this function.
+        3. The entry point function,
+            1. Can be any callable object.
+            2. Cannot be overloaded.
+            3. Any return value is ignored.
+            #include <thread>
+            
+            // Callable Object - thread entry point
+            void hello() {
+                std::cout << "Hello, Thread \n";
+            }
+            
+            // Create an std::thread object
+            // Pass the entry point function to the constructor
+            std::thread th(hello);
+
+    3. thread termination
+        1. The parent thread completes its execution.
+            1. The std::thread object goes out of scope.
+            2. Its destructor is called.
+        2. This can happen while the child is still running.
+            1. "Zombie" threads?
+            2. By default, the destructor calls std::terminate().
+            3. This terminates all threads, including main().
+
+    4. joining a thread
+        1. std::thread has a join() member function.
+        2. This is a "blocking" call.
+            1. Doesn't return until the thread has completed execution.
+            2. The parent has to stop and wait for the thread to complete.
+        3. Prevents std::thread's destructor from calling std::terminate().
+        4. This is known as "joining" the thread.
+            1. The program can continue after the std::thread object is destroyed.
+            // Callable Object - thread entry point
+            void hello() {
+                cout<<"Hello, Thread \n";
+            }
+
+            // Create an std::thread object, and pass the task function to the constructor
+            std::thread th(hello);
+
+            // Wait for the thread to complete
+            th.join();
+    
+    5. "hello, functor" program
+        1. We can use any callable object.
+        2. For example, an object of a "functor" class.
+            1. Overloads the () operator.
+        3. Pass the object to std::thread's constructor.
+        4. The object's () operator will be the entry point function.
+        5. functor as entry point
+            // Functor class with overloaded () operator
+            class Hello {
+            public:
+                void operator()() {
+                    std::cout << "Hello, Functor Thread \n";
+                }
+            };
+
+            // Create an object of the functor class
+            Hello hello;
+
+            // Pass the object to std::thread's constructor
+            std::thread th(hello);
+
+            // Wait for the thread to complete
+            th.join();
+        6. lambda expression as entry point
+            1. We can use a lambda expression.
+                // Capture by Reference, use a lambda expression as the thread's entry point
+                std::thread th([]() {
+                    std::cout << "Hello, Lambda Thread \n";
+                });
+        7. std::thread th() vs std::thread th{}
+
+
 Keep Coding!!!
